@@ -1,0 +1,195 @@
+<!--
+@license
+Copyright (c) 2015 NMB software team 202-6925-000. All rights reserved.
+-->
+
+<link rel="import" href="../polymer/polymer.html">
+
+<link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../app-layout/app-header/app-header.html">
+<link rel="import" href="../app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../app-layout/app-scroll-effects/app-scroll-effects.html">
+<link rel="import" href="../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../iron-icons/iron-icons.html">
+<link rel="import" href="../iron-list/iron-list.html">
+<link rel="import" href="../firebase-element/firebase-collection.html">
+
+<!--
+
+Example:
+
+    <aws-caseload></aws-caseload>
+
+Example:
+
+    <aws-caseload>
+      <h2>Hello aws-caseload</h2>
+    </aws-caseload>
+
+@demo demo/index.html
+@hero hero.svg
+-->
+
+<dom-module id="aws-caseload">
+  <template>
+    <style>
+      :host {
+        /*display: block;
+        box-sizing: border-box;*/
+
+        @apply(--layout-fullbleed);
+        font-family: 'Roboto', 'Noto', sans-serif;
+        background-color: #eee;
+      }
+
+
+
+
+      app-toolbar {
+        background-color: var(--google-green-700);
+        box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.3);
+        font-weight: bold;
+        color: white;
+        z-index: 1;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+      }
+      app-toolbar paper-icon-button {
+        --paper-icon-button-ink-color: white;
+      }
+
+
+
+
+
+
+
+
+      iron-list {
+        @apply(--layout-fit);
+        /*padding-top: 75px;*/
+        margin-top: 128px;
+        padding-bottom: 16px;
+      }
+      /*.item {
+        padding: 10px;
+        border-bottom: 1px solid #ccc;
+      }*/
+
+      td {
+        border-style: solid;
+        border-color: green;
+      }
+
+     
+
+      #mylist {
+        margin-top: 65px;
+      }
+
+      .w150 {
+        width: 150px;
+      }
+      .w200 {
+        width: 200px;
+      }
+      .w300 {
+        width: 300px;
+      }
+      .w100 {
+        width: 100px;
+      }
+     </style>
+
+      <firebase-collection
+          location="{{_arbcasePath}}"
+          data="{{data}}">
+      </firebase-collection>
+
+    <app-toolbar>
+      <div title>Collapsable items</div>
+      <paper-icon-button icon="search" alt="Search"></paper-icon-button>
+      <paper-icon-button icon="more-vert" alt="More options"></paper-icon-button>
+    </app-toolbar>
+
+      <!-- iron-list using the document scroll -->
+    <!-- <div id="mylist">
+      <iron-list items="[[data]]" as="item">
+        <template>
+          <div class="item">
+            <span>[[item.arbitrator]]</span>
+            <span>[[item.__firebaseKey__]]</span>
+            <span>[[item.carrier]]</span>
+            <span>[[item.union]]</span>
+            <span>[[item.dateOpen]]</span>
+            <span>[[item.dateHeard]]</span>
+            <span>????</span>
+          
+          </div>
+        </template>
+      </iron-list>
+    </div> -->
+
+    <table id="mylist">
+      <tr>
+        <th class="w150">arbitrator</th>
+        <th class="w200">case</th>
+        <th class="w300">carrier</th>
+        <th class="w300">union</th>
+        <th class="w100">Opened</th>
+        <th class="w100">Heard</th>
+        <th class="w100">Late</th>
+      </tr>
+      <iron-list items="[[data]]" as="item">
+        <template>
+          <tr class="item">
+            <td class="w150">[[item.arbitrator]]</td>
+            <td class="w200">[[item.__firebaseKey__]]</td>
+            <td class="w300">[[item.carrier]]</td>
+            <td class="w300">[[item.union]]</td>
+            <td class="w100">[[item.dateOpened]]</td>
+            <td class="w100">[[item.dateHeard]]</td>
+            <td class="w100">????</td>
+          
+          </tr>
+        </template>
+      </iron-list>
+    </table>
+    
+  </template>
+
+  <script>
+    Polymer({
+      is: 'aws-caseload',
+
+      properties: {
+        
+        fireDb: {
+          type: String,
+          value: function () {
+            return null;
+          }
+        }, 
+
+        _arbcasePath: String,
+
+        data: {
+          type: Array,
+          value: function () {
+            return []
+          }
+        }
+
+      },
+
+      ready: function () {
+        this._arbcasePath = this.fireDb + "/arbcases";
+        console.log("yes " + this._arbcasePath);
+        console.log(this.data);
+      }
+
+    });
+  </script>
+</dom-module>
