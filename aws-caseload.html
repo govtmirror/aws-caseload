@@ -13,6 +13,9 @@ Copyright (c) 2015 NMB software team 202-6925-000. All rights reserved.
 <link rel="import" href="../iron-icons/iron-icons.html">
 <link rel="import" href="../iron-list/iron-list.html">
 <link rel="import" href="../firebase-element/firebase-collection.html">
+<link rel="import" href="../paper-spinner/paper-spinner.html">
+<link rel="import" href="../paper-input/paper-input.html">
+<link rel="import" href="../paper-button/paper-button.html">
 
 <!--
 
@@ -39,14 +42,18 @@ Example:
 
         @apply(--layout-fullbleed);
         font-family: 'Roboto', 'Noto', sans-serif;
-        background-color: #eee;
+        background-color: #ddd;
       }
 
+      paper-button {
+        width: 100%;
+        height: 100%;
+      }
 
-
+    
 
       app-toolbar {
-        background-color: var(--google-green-700);
+        background-color: var(--primary-color);
         box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.3);
         font-weight: bold;
         color: white;
@@ -56,31 +63,31 @@ Example:
         left: 0;
         right: 0;
       }
-      app-toolbar paper-icon-button {
-        --paper-icon-button-ink-color: white;
+     
+
+      
+      #loadingspinner {
+        position: fixed;
+        top:50%;
+        left:50%;
+        margin-left:-14px;
+        margin-top:-14px;
+      }
+      #filtertext {
+        /*margin-top:100px;*/
+        background-color: white;
+        color:black;
+        /*height:40px;*/
       }
 
-
-
-
-
-
-
-
-      iron-list {
-        @apply(--layout-fit);
-        /*padding-top: 75px;*/
-        margin-top: 128px;
-        padding-bottom: 16px;
-      }
-      /*.item {
-        padding: 10px;
-        border-bottom: 1px solid #ccc;
-      }*/
 
       td {
-        border-style: solid;
-        border-color: green;
+        background-color: white;
+        padding:5px;
+      }
+
+      table {
+        background-color: #ccc;
       }
 
      
@@ -90,74 +97,71 @@ Example:
       }
 
       .w150 {
-        width: 150px;
+        width: 15%;
       }
       .w200 {
-        width: 200px;
+        width: 15%;
       }
       .w300 {
-        width: 300px;
+        width: 30%;
       }
       .w100 {
-        width: 100px;
+        width: 10%;
+        text-align: center;
+      }
+
+      #header {
+        background-color: red;
+        width:1250px;
+        border-radius: 15px;
+        height:150px;
       }
      </style>
 
-      <firebase-collection
-          location="{{_arbcasePath}}"
-          data="{{data}}">
-      </firebase-collection>
+
+
+
+      <paper-spinner id="loadingspinner" active></paper-spinner>
+
 
     <app-toolbar>
-      <div title>Collapsable items</div>
-      <paper-icon-button icon="search" alt="Search"></paper-icon-button>
-      <paper-icon-button icon="more-vert" alt="More options"></paper-icon-button>
+      <div title>Caseload Report, total cases = {{_caseCount}}</div>
+      <span>Filter:&nbsp;&nbsp;</span>
+      <input type="text" id="filtertext" on-change="_doFilter"></input>
     </app-toolbar>
 
-      <!-- iron-list using the document scroll -->
-    <!-- <div id="mylist">
-      <iron-list items="[[data]]" as="item">
-        <template>
-          <div class="item">
-            <span>[[item.arbitrator]]</span>
-            <span>[[item.__firebaseKey__]]</span>
-            <span>[[item.carrier]]</span>
-            <span>[[item.union]]</span>
-            <span>[[item.dateOpen]]</span>
-            <span>[[item.dateHeard]]</span>
-            <span>????</span>
-          
-          </div>
-        </template>
-      </iron-list>
+ 
+
+    <!-- <div  
+      <div title>Caseload Report, total cases = {{_caseCount}}</div>
+      <input type="text" id="filtertext" on-change="_doFilter"></input>
     </div> -->
+    
 
     <table id="mylist">
       <tr>
-        <th class="w150">arbitrator</th>
-        <th class="w200">case</th>
-        <th class="w300">carrier</th>
-        <th class="w300">union</th>
-        <th class="w100">Opened</th>
-        <th class="w100">Heard</th>
-        <th class="w100">Late</th>
+        <th class="w150"><paper-button on-tap="_arbCaseSort">Arbitrator</paper-button></th>
+        <th class="w200"><paper-button on-tap="_caseSort">Case</paper-button></th>
+        <th class="w300"><paper-button on-tap="_carrierSort">Carrier</paper-button></th>
+        <th class="w300"><paper-button on-tap="_unionSort">Union</paper-button></th>
+        <th class="w100"><paper-button on-tap="_openedSort">Opened</paper-button></th>
+        <th class="w100"><paper-button noink>Heard</paper-button></th>
+        <th class="w100"><paper-button noink>Late?</paper-button></th>
       </tr>
-      <iron-list items="[[data]]" as="item">
-        <template>
+        <template is="dom-repeat" items="{{data}}" id="casetable" filter="_filter_that_bugger">
           <tr class="item">
             <td class="w150">[[item.arbitrator]]</td>
             <td class="w200">[[item.__firebaseKey__]]</td>
             <td class="w300">[[item.carrier]]</td>
             <td class="w300">[[item.union]]</td>
-            <td class="w100">[[item.dateOpened]]</td>
-            <td class="w100">[[item.dateHeard]]</td>
-            <td class="w100">????</td>
-          
+            <td class="w100">[[_dateConvert(item.dateOpened)]]</td>
+            <td class="w100">[[_dateConvert(item.dateHeard)]]</td>
+            <td class="w100">{{_isLate(item.dateHeard)}}</td>
           </tr>
         </template>
-      </iron-list>
     </table>
     
+
   </template>
 
   <script>
@@ -180,16 +184,192 @@ Example:
           value: function () {
             return []
           }
-        }
+        },
+
+        aaa: {
+          type: Array,
+          value: function () {
+            return []
+          }
+        },
+
+        _caseCount: Number
+        
+        
 
       },
 
       ready: function () {
         this._arbcasePath = this.fireDb + "/arbcases";
-        console.log("yes " + this._arbcasePath);
-        console.log(this.data);
+        var ref = new Firebase(this._arbcasePath);
+        var jsondata = ref.orderByChild("open").equalTo(true).once("value", function(snapshot) {
+          this.aaa = [];
+          var jsondata = snapshot.val();
+          var myKeys = Object.keys(jsondata);
+          
+          for (var i = 0; i < myKeys.length; i++) {
+
+            var theKey = myKeys[i];
+            var tempstuff = jsondata[theKey];
+            if (tempstuff['assigned']) {
+              tempstuff['__firebaseKey__'] = theKey;
+              tempstuff['arbitrator'] = this._validateName(tempstuff['arbitrator']);
+              this.aaa.push(tempstuff);
+            }
+            
+          }
+          
+          this.aaa.sort(this._arbsort);
+          this.data = this.aaa;
+
+          this._caseCount = this.aaa.length;
+          
+          this.$.loadingspinner.removeAttribute('active');
+        }, this);
+      },
+
+      _validateName: function (name) {
+        var lower = name.toLowerCase();
+        var lowerArray = lower.split(" ");
+        var nameArray = [];
+        for (b in lowerArray) {
+          var substr = lowerArray[b];
+          var capstr = substr.charAt(0).toUpperCase() + substr.slice(1);
+          nameArray.push(capstr);
+        }
+        var validName = nameArray.pop() + ",";
+        for (a in nameArray) {
+          validName = validName + " " + nameArray[a];
+        }
+
+        return validName; 
+      },
+
+
+      _dateConvert: function (stringint) {
+        if (stringint != "" && stringint != null){
+          
+
+
+          var d = new Date(parseInt(stringint));
+          return d.toLocaleDateString();
+        } else {
+          return "";
+        }
+      }, 
+
+      _isLate: function (stringint){
+        if (stringint != "" && stringint != null){
+          var latedate = parseInt(stringint) + (90 * 24 * 3600 * 1000);
+
+
+          console.log(Date.now() + ", " + latedate);
+          if (Date.now() > latedate) {return "LATE";} else {return "no no";};
+        } else {
+          return "no";
+        }
+      }, 
+
+      _arbsort: function (a, b) {
+        var aName = a.arbitrator;
+        var bName = b.arbitrator;
+        var aCase = a.__firebaseKey__;
+        var bCase = b.__firebaseKey__;
+        if (aName > bName) {return 1;};
+        if (aName < bName) {return -1;};
+        if (aCase > bCase) {return 1;};
+        if (aCase < bCase) {return -1;};
+
+        return 0;
+      },
+
+      _arbCaseSort: function () {
+        this.data.sort(this._arbsort);
+        this.$.casetable.render();
+      },
+
+      _carrierSort: function () {
+        this.data.sort(
+            function (a,b) {
+              var aa = a.carrier;
+              var bb = b.carrier;
+              var aCase = a.__firebaseKey__;
+              var bCase = b.__firebaseKey__;  
+              if (aa > bb) {return 1;};
+              if (aa < bb) {return -1;};
+              if (aCase > bCase) {return 1;};
+              if (aCase < bCase) {return -1;};
+              return 0;
+            }
+          );
+        this.$.casetable.render();
+      },
+
+      _unionSort: function () {
+        this.data.sort(
+            function (a,b) {
+              var aa = a.union;
+              var bb = b.union;
+              var aCase = a.__firebaseKey__;
+              var bCase = b.__firebaseKey__;
+              if (aa > bb) {return 1;};
+              if (aa < bb) {return -1;};
+              if (aCase > bCase) {return 1;};
+              if (aCase < bCase) {return -1;};
+              return 0;
+            }
+          );
+        this.$.casetable.render();
+      },
+
+      _openedSort: function () {
+        this.data.sort(
+            function (a,b) {
+              var aa = a.dateOpened;
+              var bb = b.dateOpened;
+              var aCase = a.__firebaseKey__;
+              var bCase = b.__firebaseKey__;
+              if (aa > bb) {return 1;};
+              if (aa < bb) {return -1;};
+              if (aCase > bCase) {return 1;};
+              if (aCase < bCase) {return -1;};
+              return 0;
+            }
+          );
+        this.$.casetable.render();
+      },
+
+      _caseSort: function () {
+        this.data.sort(
+            function (a,b) {
+              var aa = a.__firebaseKey__;
+              var bb = b.__firebaseKey__;
+              if (aa > bb) {return 1;};
+              if (aa < bb) {return -1;};
+              return 0;
+            }
+          );
+        this.$.casetable.render();
+      },  
+
+
+      _doFilter: function () {
+        this.$.casetable.render();
+      },
+
+      _filter_that_bugger: function (item) {
+        var test = this.$.filtertext.value.toLowerCase();
+        if (test == "") {return true;};
+        if (item.arbitrator.toLowerCase().includes(test)) {return true;};
+        if (item.__firebaseKey__.toLowerCase().includes(test)) {return true;};
+        if (item.carrier.toLowerCase().includes(test)) {return true;};
+        if (item.union.toLowerCase().includes(test)) {return true;};
+        if (this._dateConvert(item.dateOpened).includes(test)) {return true;};
+        return false;
       }
 
-    });
+
+
+        });
   </script>
 </dom-module>
