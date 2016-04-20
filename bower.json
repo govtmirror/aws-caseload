@@ -26,7 +26,12 @@
     "paper-icon-button": "PolymerElements/paper-icon-button#^1.0.0",
     "firebase-element": "GoogleWebComponents/firebase-element#^1.0.0",
     "paper-spinner": "PolymerElements/paper-spinner#^1.0.0",
-    "paper-input": "PolymerElements/paper-input#^1.0.0"
+    "paper-input": "PolymerElements/paper-input#^1.0.0",
+    "paper-dialog": "PolymerElements/paper-dialog#^1.0.0",
+    "paper-dialog-behavior": "PolymerElements/paper-dialog-behavior#^1.0.0",
+    "paper-dialog-scrollable": "PolymerElements/paper-dialog-scrollable#^1.0.0",
+    "nmb-private-pages": "NMB-Dev/nmb-private-pages#~0.0.1",
+    "iron-image": "PolymerElements/iron-image#^1.2.0"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",

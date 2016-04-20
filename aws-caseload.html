@@ -11,11 +11,14 @@ Copyright (c) 2015 NMB software team 202-6925-000. All rights reserved.
 <link rel="import" href="../app-layout/app-scroll-effects/app-scroll-effects.html">
 <link rel="import" href="../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../iron-icons/iron-icons.html">
+<link rel="import" href="../iron-image/iron-image.html">
 <link rel="import" href="../iron-list/iron-list.html">
 <link rel="import" href="../firebase-element/firebase-collection.html">
 <link rel="import" href="../paper-spinner/paper-spinner.html">
 <link rel="import" href="../paper-input/paper-input.html">
 <link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../paper-dialog/paper-dialog.html">
+<link rel="import" href="../paper-dialog-scrollable/paper-dialog-scrollable.html">
 
 <!--
 
@@ -52,16 +55,26 @@ Example:
 
     
 
-      app-toolbar {
+      .app-toolbar {
         background-color: var(--primary-color);
-        box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.3);
-        font-weight: bold;
         color: white;
-        z-index: 1;
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
+        @apply(--layout-horizontal);
+        @apply(--layout-center);
+        padding:20px;
+        margin-bottom: 10px;
+        border-radius: 15px;
+      }
+
+      .flexchild {
+        @apply(--layout-flex);
+      }
+
+      span {
+        margin:5px;
+      }
+
+      iron-image {
+        back
       }
      
 
@@ -80,6 +93,10 @@ Example:
         /*height:40px;*/
       }
 
+      .caseloadtitle {
+        @apply(--paper-font-display2);
+        margin-left:20px;
+      }
 
       td {
         background-color: white;
@@ -90,11 +107,16 @@ Example:
         background-color: #ccc;
       }
 
+      paper-dialog {
+        background-color: #ddf;
+        width:80%;
+      }
+
      
 
-      #mylist {
+      /*#mylist {
         margin-top: 65px;
-      }
+      }*/
 
       .w150 {
         width: 15%;
@@ -121,21 +143,78 @@ Example:
 
 
 
-      <paper-spinner id="loadingspinner" active></paper-spinner>
+    <paper-spinner id="loadingspinner" active></paper-spinner>
+
+    <paper-dialog opened modal>
+      <h2>NMB Arbitrators’ Case Report Site Terms of Use</h2>
+      <paper-dialog-scrollable>
+        <p>
+          <strong>IMPORTANT</strong>
+        </p>
+        <p >By entering this site you agree to the terms
+          of use explained below.</p>
+        <p>The National Mediation Board (NMB) maintains this web site to
+          enhance public access to the NMB's information. This is a service
+          that is continually under development. While we try to keep the
+          information timely and accurate, we make no guarantees. We will make
+          an effort to correct errors brought to our attention. Users should be
+          aware that some of the documents and information available on this
+          web site may not reflect official positions of the NMB.</p>
+        <p>Any person accessing the National Mediation Board or National
+          Mediation Board Knowledge Store (NMB/Knowledge Store) sites agrees
+          not to use the site for sale, trade or other commercial purposes.</p>
+        <p>THE MATERIALS IN THIS SITE ARE PROVIDED "AS IS" AND WITHOUT
+          WARRANTIES OF ANY KIND EITHER EXPRESS OR IMPLIED. TO THE FULLEST
+          EXTENT PERMISSIBLE PURSUANT TO APPLICABLE LAW, THE NMB DISCLAIMS ALL
+          WARRANTIES, EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
+          IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+          PURPOSE. THE NMB DOES NOT WARRANT OR REPRESENT THAT THE INFORMATION
+          IS ACCURATE OR RELIABLE OR THAT THE SITE WILL BE FREE OF ERRORS OR
+          VIRUSES.</p>
+        <p>Under no circumstances, including but not limited to
+          negligence, will the NMB be liable for special or consequential
+          damages that result from the use or inability to use the materials in
+          this site. In no event shall the NMB ’ s liability to a user for any
+          loss, damage or claim exceed the amount paid by the user for
+          accessing this site.</p>
+        <p>This agreement is effective until terminated by either party.
+          You may terminate this agreement at any time by discontinuing your
+          use of the NMB/ Knowledge Store sites and destroying all materials
+          obtained from it.</p>
+        <p>
+          <strong>The NMB’s Arbitrators’ Case Report is a listing of
+            all cases assigned to arbitrators and all cases which have been
+            funded.</strong>
+        </p>
+      </paper-dialog-scrollable>
+      <div class="buttons">
+        <paper-button dialog-confirm>Accept</paper-button>
+      </div>
+    </paper-dialog>
 
 
-    <app-toolbar>
+    <!-- <app-toolbar>
       <div title>Caseload Report, total cases = {{_caseCount}}</div>
       <span>Filter:&nbsp;&nbsp;</span>
       <input type="text" id="filtertext" on-change="_doFilter"></input>
-    </app-toolbar>
+    </app-toolbar> -->
+
+
 
  
 
-    <!-- <div  
-      <div title>Caseload Report, total cases = {{_caseCount}}</div>
-      <input type="text" id="filtertext" on-change="_doFilter"></input>
-    </div> -->
+    <div class="app-toolbar"> 
+      <iron-image style="width:150px; height:150px;" sizing="contain"
+          src="img/nmb_logo-new.gif"></iron-image>
+      <div class="caseloadtitle">Caseload Report</div>
+      <div class="flexchild"></div>
+      <div>
+        <span>Filter:&nbsp;&nbsp;
+        <input type="text" id="filtertext" on-change="_doFilter"></input></span><br>
+        <span>total cases = {{_caseCount}}</span>
+      </div>
+      
+    </div>
     
 
     <table id="mylist">
